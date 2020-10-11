@@ -5,6 +5,8 @@ import axios from "axios";
 const initialState: IDeckBuilderInitialState = {
 	error: "",
 	searchStatus: "idle",
+	saveStatus: "idle",
+	fetchCollectionStatus: "idle",
 	searchResult: undefined,
 	mainDeckList: {},
 	mainDeckLength: 0,
@@ -16,17 +18,44 @@ const trimName = (name: string) => {
 	const trimmedName = partial.replace(`"`, "").trim();
 	return trimmedName;
 };
+const normalizeCard = (card: any) => {
+	const hasFaces = Boolean(card.card_faces !== undefined);
+	const hasImageUris = Boolean(card.image_uris !== undefined);
+	const hasBothManaCosts = Boolean(
+		hasFaces &&
+			card.card_faces[0].mana_cost.length &&
+			card.card_faces[1].mana_cost.length
+	);
+	let cardObj = {
+		name: card.name,
+		mana_cost: hasFaces
+			? hasBothManaCosts
+				? card.card_faces[0].mana_cost + "/" + card.card_faces[1].mana_cost
+				: card.card_faces[0].mana_cost
+			: card.mana_cost,
+		image_uris:
+			hasFaces && !hasImageUris
+				? card.card_faces.map((face: any) => ({
+						small: face.image_uris.small,
+						normal: face.image_uris.normal,
+				  }))
+				: {
+						small: card.image_uris.small,
+						normal: card.image_uris.normal,
+				  },
+		type_line: card.type_line,
+	};
+	return cardObj;
+};
 export const fetchIndividualCard = createAsyncThunk(
 	"deckBuilder/fetchIndividualCard",
 	async (name: string, thunkAPI) => {
 		try {
-			console.log("response");
 			const response = await axios.get(
 				`https://api.scryfall.com/cards/named?exact=${name}`
 			);
-			console.log(response);
-
-			return { card: response.data, success: true, error: "" };
+			const card = normalizeCard(response.data);
+			return { card, success: true, error: "" };
 		} catch (error) {
 			console.error(error);
 			return { error };
@@ -47,7 +76,6 @@ export const fetchCardCollection = createAsyncThunk(
 
 		try {
 			const response: any = await axios.all(requests);
-
 			const data: Array<any> =
 				response.length > 1
 					? response.reduce((a: any, b: any) => a.data.data.concat(b.data.data))
@@ -55,7 +83,11 @@ export const fetchCardCollection = createAsyncThunk(
 
 			data.forEach((card: any) => {
 				const trimmedName = trimName(card.name);
-				quantities[trimmedName] = { ...card, ...quantities[trimmedName] };
+				const normalizedCard = normalizeCard(card);
+				quantities[trimmedName] = {
+					...normalizedCard,
+					...quantities[trimmedName],
+				};
 			});
 			return { decklist: quantities, success: true, error: "" };
 		} catch (error) {
@@ -66,10 +98,17 @@ export const fetchCardCollection = createAsyncThunk(
 );
 export const saveDeckList = createAsyncThunk(
 	"deckBuilder/saveDeckList",
-	async (deckList: any, thunkAPI) => {
-		console.log("DECKLIST TO SAVE", deckList);
+	async (
+		{ deckList, name, format }: { deckList: any; name: string; format: string },
+		thunkAPI: { dispatch: any; getState: () => any }
+	) => {
+		const auth = thunkAPI.getState().auth;
 		try {
-			const response = await axios.post(`/api/decks`, deckList);
+			const response = await axios.post(`/api/decks/${auth.user._id}`, {
+				deckList,
+				name,
+				format,
+			});
 			console.log(response);
 
 			return { success: true, error: "" };
@@ -134,10 +173,11 @@ const deckBuilderSlice = createSlice({
 			state.error = "Something went wrong with our servers";
 		});
 		builder.addCase(fetchCardCollection.pending, (state, action) => {
-			state.searchStatus = "pending";
+			state.fetchCollectionStatus = "pending";
 		});
 		builder.addCase(fetchCardCollection.fulfilled, (state, action) => {
 			state.mainDeckList = action.payload.decklist;
+			console.log("decklist payload", action.payload.decklist);
 			state.mainDeckLength = Object.values(action.payload.decklist).reduce(
 				(a: number, b: any) => {
 					const quantityB: number = ~~b.quantity;
@@ -145,10 +185,21 @@ const deckBuilderSlice = createSlice({
 				},
 				0
 			);
-			state.searchStatus = "fulfilled";
+			state.fetchCollectionStatus = "fulfilled";
 		});
 		builder.addCase(fetchCardCollection.rejected, (state, action) => {
-			state.searchStatus = "rejected";
+			state.fetchCollectionStatus = "rejected";
+			console.log(action);
+			state.error = "Something went wrong with our servers";
+		});
+		builder.addCase(saveDeckList.pending, (state, action) => {
+			state.saveStatus = "pending";
+		});
+		builder.addCase(saveDeckList.fulfilled, (state, action) => {
+			state.saveStatus = "fulfilled";
+		});
+		builder.addCase(saveDeckList.rejected, (state, action) => {
+			state.saveStatus = "rejected";
 			console.log(action);
 			state.error = "Something went wrong with our servers";
 		});
@@ -167,6 +218,7 @@ export const selectDeckName = (state: IStore) => state.deckBuilder.deckName;
 export const selectDeckFormat = (state: IStore) => state.deckBuilder.deckFormat;
 export const selectSearchStatus = (state: IStore) =>
 	state.deckBuilder.searchStatus;
+export const selectSaveStatus = (state: IStore) => state.deckBuilder.saveStatus;
 export const selectSearchResult = (state: IStore) =>
 	state.deckBuilder.searchResult;
 export const selectMainDeckLength = (state: IStore) =>

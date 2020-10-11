@@ -17,14 +17,14 @@ function CardImage() {
 	React.useEffect(() => {
 		setCardFace(0);
 	}, [card]);
-	const hasImage = Boolean(card?.image_uris !== undefined);
-	const hasMoreFaces = Boolean(card?.card_faces !== undefined);
+	const hasOneImage = Boolean(card?.image_uris.normal !== undefined);
+	const hasMoreFaces = Boolean(card?.image_uris[1] !== undefined);
 	const handleFlipCardFace = () =>
 		hasMoreFaces ? setCardFace((prevState) => (!prevState ? 1 : 0)) : null;
-
+	console.log(card?.image_uris);
 	return (
 		<div className={classes.imgDiv} onClick={handleFlipCardFace}>
-			{hasImage ? (
+			{hasOneImage ? (
 				<img
 					className={classes.image}
 					src={card.image_uris.normal}
@@ -33,7 +33,7 @@ function CardImage() {
 			) : hasMoreFaces ? (
 				<img
 					className={classes.image}
-					src={card?.card_faces[cardFace].image_uris.normal}
+					src={card.image_uris[cardFace].normal}
 					alt="No results"
 				/>
 			) : (

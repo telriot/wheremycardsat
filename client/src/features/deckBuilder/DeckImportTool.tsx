@@ -22,13 +22,18 @@ function DeckImportTool() {
 
 		const parseContent = (content: string) => {
 			const maxLength = 75;
-			const parsedContent = content.split("\n").map((line: string) => {
-				const [quantity, ...cardName] = line.split(/\s/);
-				return {
-					name: cardName.join(" ").trim(),
-					quantity: parseInt(quantity),
-				};
-			});
+			const parsedContent = content
+				.split("\n")
+				.map((line: string) => {
+					const [quantity, ...cardName] = line.split(/\s/);
+					const name = cardName.join(" ").trim();
+
+					return {
+						name,
+						quantity: parseInt(quantity),
+					};
+				})
+				.filter((el: any) => el.name.length);
 			let result = [];
 			let counter = Math.ceil(parsedContent.length / maxLength - 1);
 			while (counter >= 0) {
@@ -45,9 +50,7 @@ function DeckImportTool() {
 			content: Array<{ name: string; quantity: number }>
 		) => {
 			let identifiers: Array<{ name: string }> = [];
-			content.forEach(
-				(card) => card.name.length && identifiers.push({ name: card.name })
-			);
+			content.forEach((card) => identifiers.push({ name: card.name }));
 			return { identifiers: identifiers };
 		};
 
@@ -56,8 +59,7 @@ function DeckImportTool() {
 		) => {
 			let quantityList: any = {};
 			content.forEach(
-				(card) =>
-					card.name && (quantityList[card.name] = { quantity: card.quantity })
+				(card) => (quantityList[card.name] = { quantity: card.quantity })
 			);
 			return quantityList;
 		};

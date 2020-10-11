@@ -65,7 +65,6 @@ export default function DeckTable() {
 				<TableBody>
 					{Object.entries(mainDeckList).map(([cardName, cardObject]: any) => {
 						const hasFaces = Boolean(cardObject.card_faces !== undefined);
-						console.log(cardObject);
 						return (
 							<TableRow key={cardName}>
 								<TableCell component="th" scope="row">
