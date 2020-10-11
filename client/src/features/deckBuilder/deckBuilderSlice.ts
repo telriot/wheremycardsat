@@ -36,19 +36,27 @@ export const fetchIndividualCard = createAsyncThunk(
 export const fetchCardCollection = createAsyncThunk(
 	"deckBuilder/fetchCardCollection",
 	async ({ collection, quantities }: any, thunkAPI) => {
-		try {
-			const response = await axios.post(
+		console.log("COLLECTION", collection[0]);
+		const requests = collection.map((chunk: any, index: number) =>
+			axios.post(
 				`https://api.scryfall.com/cards/collection`,
-				JSON.stringify(collection),
+				JSON.stringify(chunk),
 				{ headers: { "Content-Type": "application/json" } }
-			);
-			const { data } = response.data;
+			)
+		);
+
+		try {
+			const response: any = await axios.all(requests);
+
+			const data: Array<any> =
+				response.length > 1
+					? response.reduce((a: any, b: any) => a.data.data.concat(b.data.data))
+					: response[0].data.data;
 
 			data.forEach((card: any) => {
 				const trimmedName = trimName(card.name);
 				quantities[trimmedName] = { ...card, ...quantities[trimmedName] };
 			});
-
 			return { decklist: quantities, success: true, error: "" };
 		} catch (error) {
 			console.error(error);
@@ -56,9 +64,26 @@ export const fetchCardCollection = createAsyncThunk(
 		}
 	}
 );
+export const saveDeckList = createAsyncThunk(
+	"deckBuilder/saveDeckList",
+	async (deckList: any, thunkAPI) => {
+		console.log("DECKLIST TO SAVE", deckList);
+		try {
+			const response = await axios.post(`/api/decks`, deckList);
+			console.log(response);
+
+			return { success: true, error: "" };
+		} catch (error) {
+			console.error(error);
+			return { error };
+		}
+	}
+);
+
 const deckBuilderSlice = createSlice({
 	name: "deckBuilder",
 	initialState,
+
 	reducers: {
 		cardAdded: (state) => {
 			const cardName = trimName(state.searchResult.name);
@@ -94,6 +119,7 @@ const deckBuilderSlice = createSlice({
 			state.deckFormat = action.payload;
 		},
 	},
+
 	extraReducers: (builder) => {
 		builder.addCase(fetchIndividualCard.pending, (state, action) => {
 			state.searchStatus = "pending";
@@ -112,6 +138,13 @@ const deckBuilderSlice = createSlice({
 		});
 		builder.addCase(fetchCardCollection.fulfilled, (state, action) => {
 			state.mainDeckList = action.payload.decklist;
+			state.mainDeckLength = Object.values(action.payload.decklist).reduce(
+				(a: number, b: any) => {
+					const quantityB: number = ~~b.quantity;
+					return a + quantityB;
+				},
+				0
+			);
 			state.searchStatus = "fulfilled";
 		});
 		builder.addCase(fetchCardCollection.rejected, (state, action) => {
@@ -121,6 +154,7 @@ const deckBuilderSlice = createSlice({
 		});
 	},
 });
+
 export const {
 	cardAdded,
 	cardQuantityIncreased,
@@ -135,6 +169,8 @@ export const selectSearchStatus = (state: IStore) =>
 	state.deckBuilder.searchStatus;
 export const selectSearchResult = (state: IStore) =>
 	state.deckBuilder.searchResult;
+export const selectMainDeckLength = (state: IStore) =>
+	state.deckBuilder.mainDeckLength;
 export const selectMainDeckList = (state: IStore) =>
 	state.deckBuilder.mainDeckList;
 

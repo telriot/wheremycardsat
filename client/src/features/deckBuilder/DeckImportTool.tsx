@@ -2,8 +2,6 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import Input from "@material-ui/core/Input";
-import { parse } from "path";
 import { fetchCardCollection } from "./deckBuilderSlice";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -23,13 +21,24 @@ function DeckImportTool() {
 		const content = fileReader.result;
 
 		const parseContent = (content: string) => {
-			return content.split("\n").map((line: string) => {
+			const maxLength = 75;
+			const parsedContent = content.split("\n").map((line: string) => {
 				const [quantity, ...cardName] = line.split(/\s/);
 				return {
 					name: cardName.join(" ").trim(),
 					quantity: parseInt(quantity),
 				};
 			});
+			let result = [];
+			let counter = Math.ceil(parsedContent.length / maxLength - 1);
+			while (counter >= 0) {
+				result.push(
+					parsedContent.slice(counter * maxLength, (counter + 1) * maxLength)
+				);
+				counter--;
+			}
+
+			return { chunks: result, list: parsedContent };
 		};
 
 		const buildRequestObj = (
@@ -54,8 +63,14 @@ function DeckImportTool() {
 		};
 
 		const parsedContent = parseContent(content);
-		const quantityList = buildQuantityList(parsedContent);
-		const requestObj = buildRequestObj(parsedContent);
+		const quantityList = buildQuantityList(parsedContent.list);
+		const requestObj = parsedContent.chunks.map((chunk) =>
+			buildRequestObj(chunk)
+		);
+		console.log(
+			"REQUEST OBJ",
+			parsedContent.chunks.map((chunk) => buildQuantityList(chunk))
+		);
 		await dispatch(
 			fetchCardCollection({ collection: requestObj, quantities: quantityList })
 		);
