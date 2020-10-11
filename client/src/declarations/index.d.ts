@@ -35,24 +35,16 @@ export interface IAuthInitialState {
   passwordResetStatus: TStatus;
   passwordResetError: string;
 }
-export interface IEventsdInitialState {
-  events: array<IEvent>;
-  eventsStatus: TStatus;
-  eventsError: string | null;
-  eventDetail: IEvent | null;
-  eventDetailStatus: TStatus;
-  eventDetailError: string | null;
-  eventUpdateStatus: TStatus;
-  eventUpdateError: string | null;
-  eventSubscriptionStatus: { status: TStatus; eventId: string | undefined };
-  status: TStatus;
+export interface IDeckBuilderInitialState {
+  searchStatus: TStatus;
   error: string;
+  searchResult:any
+  mainDeckList:any;
+  mainDeckLength:number,
+  deckName:string,
+  deckFormat:string,
 }
-export interface ITimeframeInitialState {
-  status: TStatus;
-  error: string;
-  timeframe: TTimeframe;
-}
+
 export interface IUsersInitialState {
   userPersonalProfile: IUser | null;
   status: TStatus;
@@ -63,7 +55,6 @@ export interface IUsersInitialState {
 
 export interface IStore {
   auth: IAuthInitialState;
-  events: IMainBoardInitialState;
   users: IUsersInitialState;
-  timeframe: ITimeframeInitialState;
+  deckBuilder:IDeckBuilderInitialState
 }
