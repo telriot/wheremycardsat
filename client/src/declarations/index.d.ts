@@ -1,18 +1,9 @@
 export type TStatus = "idle" | "pending" | "fulfilled" | "rejected";
 export type TTimeframe = "day" | "week" | "month" | "all" | "archived";
 
-export interface IRouteParams {
-	id: string;
-}
-export interface ISharedCard {
-	deckID: string;
-	deckName: string;
-	quantity: number;
-	availability: number;
-}
 export interface ICard {
 	name: string;
-	mana_cost: string;
+	mana_cost: string[];
 	image_uris: Array<{ small: string; normal: string }>;
 	type_line: string;
 	quantity: number;
@@ -23,6 +14,15 @@ export interface IDeck {
 	name: string;
 	format: string;
 	deckList: any;
+}
+export interface IRouteParams {
+	id: string;
+}
+export interface ISharedCard {
+	deckID: string;
+	deckName: string;
+	quantity: number;
+	availability: number;
 }
 export interface IUser {
 	_id: string;
@@ -35,6 +35,7 @@ export interface IUser {
 	joinedEvents?: any;
 }
 
+//STATE DECLARATIONS
 export interface IAuthInitialState {
 	user: null | IUser;
 	isAuth: boolean;

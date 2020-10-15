@@ -1,27 +1,42 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { IDeck, ISharedCard } from "../../declarations";
+import { useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { moveCardsBetweenDecks } from "./myDecksSlice";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
-import { ICard, IDeck, ISharedCard } from "../../declarations";
-import { moveCardsBetweenDecks } from "./myDecksSlice";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		row: {},
+		row: {
+			cursor: "pointer",
+			"&:hover, &:focus": {
+				background: theme.palette.action.selected,
+			},
+			"&:last-of-type": {
+				"& td, th": {
+					border: 0,
+				},
+			},
+		},
+		smallCell: { width: "5rem" },
 	})
 );
+
 interface IDeckDetailTableInnerRowProps {
 	sharedCard: ISharedCard;
 	deck: IDeck;
 	cardname: string;
 }
+
 const initialPosition = {
 	mouseX: null,
 	mouseY: null,
 };
+
 function DeckDetailTableInnerRow({
 	sharedCard,
 	deck,
@@ -29,11 +44,19 @@ function DeckDetailTableInnerRow({
 }: IDeckDetailTableInnerRowProps) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
+	const history = useHistory();
 
 	const [position, setPosition] = React.useState<{
 		mouseX: null | number;
 		mouseY: null | number;
 	}>(initialPosition);
+
+	const originalCard = deck.deckList[cardname];
+
+	const handleClose = () => {
+		setPosition(initialPosition);
+	};
+
 	const handleMenuOpen = (event: React.MouseEvent<HTMLDivElement>) => {
 		event.preventDefault();
 		setPosition({
@@ -41,10 +64,7 @@ function DeckDetailTableInnerRow({
 			mouseY: event.clientY - 4,
 		});
 	};
-	const handleClose = () => {
-		setPosition(initialPosition);
-	};
-	const originalCard = deck.deckList[cardname];
+
 	const handleMove = (num: number) => () => {
 		if (originalCard.availability - num < 0) return null;
 
@@ -77,16 +97,27 @@ function DeckDetailTableInnerRow({
 		dispatch(moveCardsBetweenDecks([originUpdate, destinationUpdate]));
 		handleClose();
 	};
+	const handleRedirect = () => {
+		history.push(`/my-decks/${sharedCard.deckID}`);
+		handleClose();
+	};
 
 	return (
 		<>
-			<TableRow onClick={handleMenuOpen} key={sharedCard.deckName}>
-				{" "}
+			<TableRow
+				className={classes.row}
+				onClick={handleMenuOpen}
+				key={sharedCard.deckName}
+			>
 				<TableCell component="th" scope="row">
 					{sharedCard.deckName}
 				</TableCell>
-				<TableCell align="right">{sharedCard.quantity}</TableCell>
-				<TableCell align="right">{sharedCard.availability}</TableCell>
+				<TableCell className={classes.smallCell} align="right">
+					{sharedCard.quantity}
+				</TableCell>
+				<TableCell className={classes.smallCell} align="right">
+					{sharedCard.availability}
+				</TableCell>
 			</TableRow>
 			<Menu
 				keepMounted
@@ -119,6 +150,9 @@ function DeckDetailTableInnerRow({
 						Take max from {sharedCard.deckName}
 					</MenuItem>
 				)}
+				<MenuItem onClick={handleRedirect}>
+					Visit {sharedCard.deckName}
+				</MenuItem>
 			</Menu>
 		</>
 	);

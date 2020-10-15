@@ -1,24 +1,28 @@
 import React from "react";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { useDispatch, useSelector } from "react-redux";
+import { selectAuthorizedUser } from "../auth/authSlice";
 import { selectMyDecks, fetchMyDecks } from "./myDecksSlice";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import DeckCard from "./DeckCard";
-import { selectAuthorizedUser } from "../auth/authSlice";
-import Container from "@material-ui/core/Container";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		container: { maxWidth: "48rem" },
 	})
 );
+
 function MyDecksScreen() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const myDecks = useSelector(selectMyDecks);
 	const authUser = useSelector(selectAuthorizedUser);
+	const myDecks = useSelector(selectMyDecks);
+
 	React.useEffect(() => {
 		authUser && dispatch(fetchMyDecks());
 	}, [dispatch, authUser]);
+
 	return (
 		<Container className={classes.container}>
 			<Grid container spacing={2}>

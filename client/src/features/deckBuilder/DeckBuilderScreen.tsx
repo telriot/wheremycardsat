@@ -1,16 +1,18 @@
 import React from "react";
-import Container from "@material-ui/core/Container";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import AddCardButton from "./AddCardButton";
+import CardImage from "./CardImage";
 import CardSearchInput from "./CardSearchInput";
 import Decklist from "./Decklist";
-import CardImage from "./CardImage";
-import AddCardButton from "./AddCardButton";
-import { Grid } from "@material-ui/core";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		container: { maxWidth: "48rem" },
 	})
 );
+
 function DeckBuilderScreen() {
 	const classes = useStyles();
 
@@ -19,7 +21,6 @@ function DeckBuilderScreen() {
 			<Grid container spacing={3}>
 				<Grid item xs={5}>
 					<CardSearchInput />
-
 					<AddCardButton />
 					<CardImage />
 				</Grid>

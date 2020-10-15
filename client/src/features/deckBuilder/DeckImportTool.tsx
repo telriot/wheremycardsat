@@ -1,22 +1,26 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
+import { fetchCardCollection } from "./deckBuilderSlice";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { fetchCardCollection } from "./deckBuilderSlice";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		input: { display: "none" },
 	})
 );
+
 function DeckImportTool() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = React.useState(false);
+
 	let fileReader: any;
+
 	const handleLoadStart = () => {
 		setIsLoading(true);
 	};
+
 	const handleFileRead = async () => {
 		const content = fileReader.result;
 
@@ -68,15 +72,13 @@ function DeckImportTool() {
 		const requestObj = parsedContent.chunks.map((chunk) =>
 			buildRequestObj(chunk)
 		);
-		console.log(
-			"REQUEST OBJ",
-			parsedContent.chunks.map((chunk) => buildQuantityList(chunk))
-		);
+
 		await dispatch(
 			fetchCardCollection({ collection: requestObj, quantities: quantityList })
 		);
 		setIsLoading(false);
 	};
+
 	const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const files = event.currentTarget.files;
 		if (!files?.length) return;
@@ -85,6 +87,7 @@ function DeckImportTool() {
 		fileReader.onloadend = handleFileRead;
 		fileReader.readAsText(files[0]);
 	};
+
 	return (
 		<div>
 			<label>

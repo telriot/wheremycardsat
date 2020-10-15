@@ -1,11 +1,11 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { fetchIndividualCard } from "./deckBuilderSlice";
+import { useDebounce } from "use-debounce";
+import axios from "axios";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { useDebounce } from "use-debounce";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchIndividualCard } from "./deckBuilderSlice";
-import axios from "axios";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -13,24 +13,30 @@ const useStyles = makeStyles((theme: Theme) =>
 		autocompleteDiv: { width: "300px" },
 	})
 );
+
 function CardSearchInput() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const [value, setValue] = React.useState<any>(null);
 	const [inputValue, setInputValue] = React.useState("");
 	const [options, setOptions] = React.useState<string[]>([]);
+	const [value, setValue] = React.useState<any>(null);
 	const [debouncedInputValue] = useDebounce(inputValue, 300);
-	const fetchAutocomplete = async (debouncedInputValue: string) => {
-		try {
-			const response = await axios.get(
-				`https://api.scryfall.com/cards/autocomplete?q=${debouncedInputValue}`
-			);
-			const data = response.data.data;
-			setOptions(data);
-		} catch (error) {
-			console.error(error);
-		}
-	};
+
+	const fetchAutocomplete = React.useCallback(
+		async (debouncedInputValue: string) => {
+			try {
+				const response = await axios.get(
+					`https://api.scryfall.com/cards/autocomplete?q=${debouncedInputValue}`
+				);
+				const data = response.data.data;
+				setOptions(data);
+			} catch (error) {
+				console.error(error);
+			}
+		},
+
+		[debouncedInputValue]
+	);
 
 	React.useEffect(() => {
 		if (debouncedInputValue === "") {
@@ -38,13 +44,14 @@ function CardSearchInput() {
 			return undefined;
 		}
 		fetchAutocomplete(debouncedInputValue);
-	}, [value, debouncedInputValue]);
+	}, [debouncedInputValue, fetchAutocomplete, value]);
 
 	React.useEffect(() => {
 		if (value) {
 			if (value === debouncedInputValue) dispatch(fetchIndividualCard(value));
 		}
-	}, [value, debouncedInputValue]);
+	}, [debouncedInputValue, dispatch, value]);
+
 	return (
 		<div className={classes.autocompleteDiv}>
 			<Autocomplete

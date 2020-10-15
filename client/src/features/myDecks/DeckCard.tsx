@@ -10,6 +10,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { useDispatch } from "react-redux";
 import { deleteDeck } from "./myDecksSlice";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		root: {
@@ -21,17 +22,21 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 	})
 );
+
 function DeckCard({ deck }: { deck: any }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const firstCardName = Object.keys(deck.deckList)[0];
 	const history = useHistory();
+
+	const firstCardName = Object.keys(deck.deckList)[0];
+
 	const handleView = () => {
 		history.push(`/my-decks/${deck._id}`);
 	};
 	const handleDelete = () => {
 		dispatch(deleteDeck(deck._id));
 	};
+
 	return (
 		<Card className={classes.root}>
 			<CardActionArea>

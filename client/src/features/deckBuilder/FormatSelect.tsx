@@ -1,11 +1,12 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectDeckFormat, formatChanged } from "./deckBuilderSlice";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import { useDispatch, useSelector } from "react-redux";
-import { selectDeckFormat, formatChanged } from "./deckBuilderSlice";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		formControl: {
@@ -17,24 +18,26 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 );
 
+const formats = [
+	{ name: "edh", display: "EDH" },
+	{ name: "brawl", display: "Brawl" },
+	{ name: "standard", display: "Standard" },
+	{ name: "pioneer", display: "Pioneer" },
+	{ name: "modern", display: "Modern" },
+	{ name: "legacy", display: "Legacy" },
+	{ name: "vintage", display: "Vintage" },
+	{ name: "pauper", display: "Pauper" },
+];
+
 export default function NativeSelects() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const format = useSelector(selectDeckFormat);
+
 	const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
 		dispatch(formatChanged(event.target.value as string));
 	};
 
-	const formats = [
-		{ name: "edh", display: "EDH" },
-		{ name: "brawl", display: "Brawl" },
-		{ name: "standard", display: "Standard" },
-		{ name: "pioneer", display: "Pioneer" },
-		{ name: "modern", display: "Modern" },
-		{ name: "legacy", display: "Legacy" },
-		{ name: "vintage", display: "Vintage" },
-		{ name: "pauper", display: "Pauper" },
-	];
 	return (
 		<FormControl variant="outlined" className={classes.formControl}>
 			<InputLabel id="demo-simple-select-outlined-label">Format</InputLabel>

@@ -1,12 +1,12 @@
 import React from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-
-import DeckTable from "./DeckTable";
-import DeckNameInput from "./DeckNameInput";
-import FormatSelect from "./FormatSelect";
 import DeckImportTool from "./DeckImportTool";
 import DeckLength from "./DeckLength";
+import DeckNameInput from "./DeckNameInput";
+import DeckTable from "./DeckTable";
+import FormatSelect from "./FormatSelect";
 import SaveButton from "./SaveButton";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		deckInfoDiv: {
@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 	})
 );
+
 function Decklist() {
 	const classes = useStyles();
 

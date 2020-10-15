@@ -126,14 +126,13 @@ const deckBuilderSlice = createSlice({
 		cardQuantityDecreased: (state, action) => {
 			const { cardname, quantity } = action.payload;
 			const trimmedName = trimName(cardname);
-
-			if (state.mainDeckList[trimmedName].quantity <= quantity) {
+			if (state.mainDeckList[trimmedName].quantity <= Math.abs(quantity)) {
 				state.mainDeckLength -= state.mainDeckList[trimmedName].quantity;
 				delete state.mainDeckList[trimmedName];
 			} else {
-				state.mainDeckList[trimmedName].quantity -= quantity;
-				state.mainDeckList[trimmedName].availability -= quantity;
-				state.mainDeckLength -= quantity;
+				state.mainDeckList[trimmedName].quantity -= Math.abs(quantity);
+				state.mainDeckList[trimmedName].availability -= Math.abs(quantity);
+				state.mainDeckLength -= Math.abs(quantity);
 			}
 		},
 		deckNameChanged: (state, action) => {

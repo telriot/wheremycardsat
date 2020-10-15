@@ -17,7 +17,6 @@ import PasswordUpdateForm from "./features/auth/PasswordUpdateForm";
 import LandingPage from "./features/landing/LandingPage";
 import MyDecksScreen from "./features/myDecks/MyDecksScreen";
 import DeckDetail from "./features/myDecks/DeckDetail";
-
 declare module "@material-ui/core/styles/createMuiTheme" {
 	interface Theme {
 		status: {
