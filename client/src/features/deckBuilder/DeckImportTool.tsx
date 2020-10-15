@@ -25,9 +25,8 @@ function DeckImportTool() {
 			const parsedContent = content
 				.split("\n")
 				.map((line: string) => {
-					const [quantity, ...cardName] = line.split(/\s/);
-					const name = cardName.join(" ").trim();
-
+					const [quantity, ...cardname] = line.split(/\s/);
+					const name = cardname.join(" ").trim();
 					return {
 						name,
 						quantity: parseInt(quantity),

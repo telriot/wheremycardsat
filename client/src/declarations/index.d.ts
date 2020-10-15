@@ -1,16 +1,28 @@
 export type TStatus = "idle" | "pending" | "fulfilled" | "rejected";
 export type TTimeframe = "day" | "week" | "month" | "all" | "archived";
 
-export interface IEvent {
-	_id?: string;
-	title: string;
-	description?: string;
-	day: Date;
-	startsAt?: string;
-	endsAt?: string;
-	location?: string;
-	participants: array<any>;
-	author: any;
+export interface IRouteParams {
+	id: string;
+}
+export interface ISharedCard {
+	deckID: string;
+	deckName: string;
+	quantity: number;
+	availability: number;
+}
+export interface ICard {
+	name: string;
+	mana_cost: string;
+	image_uris: Array<{ small: string; normal: string }>;
+	type_line: string;
+	quantity: number;
+	availability: number;
+}
+export interface IDeck {
+	_id: string;
+	name: string;
+	format: string;
+	deckList: any;
 }
 export interface IUser {
 	_id: string;
@@ -49,6 +61,7 @@ export interface IDeckBuilderInitialState {
 export interface IMyDecksInitialState {
 	status: TStatus;
 	error: string;
+	decks: Array<any>;
 }
 
 export interface IUsersInitialState {
@@ -63,4 +76,5 @@ export interface IStore {
 	auth: IAuthInitialState;
 	users: IUsersInitialState;
 	deckBuilder: IDeckBuilderInitialState;
+	myDecks: IMyDecksInitialState;
 }

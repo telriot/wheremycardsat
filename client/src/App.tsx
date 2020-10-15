@@ -16,6 +16,7 @@ import ResetCredentials from "./features/auth/ResetCredentials";
 import PasswordUpdateForm from "./features/auth/PasswordUpdateForm";
 import LandingPage from "./features/landing/LandingPage";
 import MyDecksScreen from "./features/myDecks/MyDecksScreen";
+import DeckDetail from "./features/myDecks/DeckDetail";
 
 declare module "@material-ui/core/styles/createMuiTheme" {
 	interface Theme {
@@ -79,6 +80,7 @@ function App() {
 					<Switch>
 						<Route exact path="/" component={LandingPage} />
 						<Route exact path="/my-decks" component={MyDecksScreen} />
+						<Route exact path="/my-decks/:id" component={DeckDetail} />
 						<Route
 							exact
 							path="/resetCredentials"

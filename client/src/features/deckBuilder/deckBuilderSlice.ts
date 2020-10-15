@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { IDeckBuilderInitialState, IStore } from "../../declarations/index";
+import { trimName, normalizeCard } from "../../lib/helpers";
 import axios from "axios";
 
 const initialState: IDeckBuilderInitialState = {
@@ -13,40 +14,7 @@ const initialState: IDeckBuilderInitialState = {
 	deckName: "",
 	deckFormat: "",
 };
-const trimName = (name: string) => {
-	const [partial, _] = name.split("//");
-	const trimmedName = partial.replace(`"`, "").trim();
-	return trimmedName;
-};
-const normalizeCard = (card: any) => {
-	const hasFaces = Boolean(card.card_faces !== undefined);
-	const hasImageUris = Boolean(card.image_uris !== undefined);
-	const hasBothManaCosts = Boolean(
-		hasFaces &&
-			card.card_faces[0].mana_cost.length &&
-			card.card_faces[1].mana_cost.length
-	);
-	let cardObj = {
-		name: card.name,
-		mana_cost: hasFaces
-			? hasBothManaCosts
-				? card.card_faces[0].mana_cost + "/" + card.card_faces[1].mana_cost
-				: card.card_faces[0].mana_cost
-			: card.mana_cost,
-		image_uris:
-			hasFaces && !hasImageUris
-				? card.card_faces.map((face: any) => ({
-						small: face.image_uris.small,
-						normal: face.image_uris.normal,
-				  }))
-				: {
-						small: card.image_uris.small,
-						normal: card.image_uris.normal,
-				  },
-		type_line: card.type_line,
-	};
-	return cardObj;
-};
+
 export const fetchIndividualCard = createAsyncThunk(
 	"deckBuilder/fetchIndividualCard",
 	async (name: string, thunkAPI) => {
@@ -65,7 +33,6 @@ export const fetchIndividualCard = createAsyncThunk(
 export const fetchCardCollection = createAsyncThunk(
 	"deckBuilder/fetchCardCollection",
 	async ({ collection, quantities }: any, thunkAPI) => {
-		console.log("COLLECTION", collection[0]);
 		const requests = collection.map((chunk: any, index: number) =>
 			axios.post(
 				`https://api.scryfall.com/cards/collection`,
@@ -84,11 +51,20 @@ export const fetchCardCollection = createAsyncThunk(
 			data.forEach((card: any) => {
 				const trimmedName = trimName(card.name);
 				const normalizedCard = normalizeCard(card);
+				const cardQuantity = quantities[trimmedName] || { quantity: 1 };
 				quantities[trimmedName] = {
 					...normalizedCard,
-					...quantities[trimmedName],
+					...cardQuantity,
+					availability: quantities[trimmedName]
+						? quantities[trimmedName].quantity
+						: 1,
 				};
 			});
+			//Fix bug with non parsed card names
+			Object.keys(quantities).forEach(
+				(key) => !quantities[key].name && delete quantities[key]
+			);
+
 			return { decklist: quantities, success: true, error: "" };
 		} catch (error) {
 			console.error(error);
@@ -103,6 +79,7 @@ export const saveDeckList = createAsyncThunk(
 		thunkAPI: { dispatch: any; getState: () => any }
 	) => {
 		const auth = thunkAPI.getState().auth;
+
 		try {
 			const response = await axios.post(`/api/decks/${auth.user._id}`, {
 				deckList,
@@ -125,29 +102,37 @@ const deckBuilderSlice = createSlice({
 
 	reducers: {
 		cardAdded: (state) => {
-			const cardName = trimName(state.searchResult.name);
-			if (state.mainDeckList[cardName]) {
-				state.mainDeckList[cardName].quantity++;
+			const cardname = trimName(state.searchResult.name);
+			if (state.mainDeckList[cardname]) {
+				state.mainDeckList[cardname].quantity++;
+				state.mainDeckList[cardname].availability++;
 			} else {
-				state.mainDeckList[cardName] = { ...state.searchResult, quantity: 1 };
+				state.mainDeckList[cardname] = {
+					...state.searchResult,
+					quantity: 1,
+					availability: 1,
+				};
 			}
 			state.mainDeckLength++;
 		},
 		cardQuantityIncreased: (state, action) => {
-			const { cardName, quantity } = action.payload;
-			const trimmedName = trimName(cardName);
+			const { cardname, quantity } = action.payload;
+			const trimmedName = trimName(cardname);
 			state.mainDeckList[trimmedName].quantity += quantity;
+			state.mainDeckList[trimmedName].availability += quantity;
+
 			state.mainDeckLength += quantity;
 		},
 		cardQuantityDecreased: (state, action) => {
-			const { cardName, quantity } = action.payload;
-			const trimmedName = trimName(cardName);
+			const { cardname, quantity } = action.payload;
+			const trimmedName = trimName(cardname);
 
 			if (state.mainDeckList[trimmedName].quantity <= quantity) {
 				state.mainDeckLength -= state.mainDeckList[trimmedName].quantity;
 				delete state.mainDeckList[trimmedName];
 			} else {
 				state.mainDeckList[trimmedName].quantity -= quantity;
+				state.mainDeckList[trimmedName].availability -= quantity;
 				state.mainDeckLength -= quantity;
 			}
 		},

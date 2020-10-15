@@ -21,7 +21,6 @@ function CardImage() {
 	const hasMoreFaces = Boolean(card?.image_uris[1] !== undefined);
 	const handleFlipCardFace = () =>
 		hasMoreFaces ? setCardFace((prevState) => (!prevState ? 1 : 0)) : null;
-	console.log(card?.image_uris);
 	return (
 		<div className={classes.imgDiv} onClick={handleFlipCardFace}>
 			{hasOneImage ? (

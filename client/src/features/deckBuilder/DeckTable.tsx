@@ -13,9 +13,9 @@ import {
 	cardQuantityIncreased,
 	cardQuantityDecreased,
 } from "./deckBuilderSlice";
-import AddIcon from "@material-ui/icons/Add";
-import RemoveIcon from "@material-ui/icons/Remove";
-import IconButton from "@material-ui/core/IconButton";
+import QuantityToggler, {
+	TQuantityTogglerTarget,
+} from "../../components/QuantityToggler";
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		table: {
@@ -31,25 +31,18 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 );
 
-function createData(
-	name: string,
-	calories: number,
-	fat: number,
-	carbs: number,
-	protein: number
-) {
-	return { name, calories, fat, carbs, protein };
-}
-
 export default function DeckTable() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const mainDeckList = useSelector(selectMainDeckList);
-	const handleAddClick = (cardName: string, quantity: number = 1) => () => {
-		dispatch(cardQuantityIncreased({ cardName, quantity }));
-	};
-	const handleRemoveClick = (cardName: string, quantity: number = 1) => () => {
-		dispatch(cardQuantityDecreased({ cardName, quantity }));
+	const handleChangeClick = (
+		cardname: string,
+		quantity: number = 1,
+		target: TQuantityTogglerTarget
+	) => () => {
+		quantity
+			? dispatch(cardQuantityIncreased({ cardname, quantity }))
+			: dispatch(cardQuantityDecreased({ cardname, quantity }));
 	};
 
 	return (
@@ -63,10 +56,10 @@ export default function DeckTable() {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{Object.entries(mainDeckList).map(([cardName, cardObject]: any) => {
+					{Object.entries(mainDeckList).map(([cardname, cardObject]: any) => {
 						const hasFaces = Boolean(cardObject.card_faces !== undefined);
 						return (
-							<TableRow key={cardName}>
+							<TableRow key={cardname}>
 								<TableCell component="th" scope="row">
 									{cardObject.name}
 								</TableCell>
@@ -77,19 +70,12 @@ export default function DeckTable() {
 								</TableCell>
 								<TableCell align="center">
 									<div className={classes.quantityCell}>
-										<IconButton
-											className={classes.iconButton}
-											onClick={handleAddClick(cardName, 1)}
-										>
-											<AddIcon fontSize="small" />
-										</IconButton>
-										{cardObject.quantity}
-										<IconButton
-											className={classes.iconButton}
-											onClick={handleRemoveClick(cardName, 1)}
-										>
-											<RemoveIcon fontSize="small" />
-										</IconButton>
+										<QuantityToggler
+											quantity={cardObject.quantity}
+											cardname={cardname}
+											handleChangeClick={handleChangeClick}
+											target="quantity"
+										/>
 									</div>
 								</TableCell>
 							</TableRow>
