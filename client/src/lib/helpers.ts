@@ -1,4 +1,5 @@
 import React from "react";
+import { ICard } from "../declarations/index";
 export const trimName = (name: string) => {
 	const [partial, _] = name.split("//");
 	const trimmedName = partial.replace(`"`, "").trim();
@@ -39,13 +40,67 @@ export const normalizeCard = (card: any) => {
 				? card.card_faces.map((face: any) => ({
 						small: face.image_uris.small,
 						normal: face.image_uris.normal,
+						art_crop: face.image_uris.art_crop,
 				  }))
 				: {
 						small: card.image_uris.small,
 						normal: card.image_uris.normal,
+						art_crop: card.image_uris.art_crop,
 				  },
 		type_line: card.type_line,
 	};
 	console.log(cardObj.mana_cost);
 	return cardObj;
+};
+
+export const calculateManaWeight = (manacost: string[]) => {
+	if (!manacost || !manacost.length) return 0;
+	let weight = 0;
+	let numbersRegex = new RegExp(/\d/);
+	for (let symbol of manacost) {
+		if (numbersRegex.test(symbol)) {
+			weight += ~~symbol;
+		} else {
+			switch (symbol) {
+				case "w":
+					weight += 1.01;
+					break;
+				case "u":
+					weight += 1.011;
+					break;
+				case "b":
+					weight += 1.012;
+					break;
+				case "r":
+					weight += 1.013;
+					break;
+				case "g":
+					weight += 1.014;
+					break;
+				case "x":
+					weight += 1.015;
+					break;
+				default:
+					weight += 0;
+			}
+		}
+	}
+	return weight;
+};
+
+export const sortCardsByParam = (cards: Array<ICard>, param: string) => {
+	if (param === "name") {
+		return cards.sort((a, b) => {
+			const nameA = a.name.toUpperCase();
+			const nameB = b.name.toUpperCase();
+			return nameA < nameB ? -1 : nameB < nameA ? 1 : 0;
+		});
+	} else if (param === "manacost") {
+		return cards.sort((a, b) => {
+			console.log();
+			const manacostA = calculateManaWeight(a.mana_cost) || 0;
+			const manacostB = calculateManaWeight(b.mana_cost) || 0;
+			return manacostA < manacostB ? -1 : manacostB < manacostA ? 1 : 0;
+		});
+	}
 };

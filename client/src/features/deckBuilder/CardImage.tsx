@@ -6,7 +6,7 @@ import CardBack from "../../assets/cardBack.jpg";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		imgDiv: { maxHeight: "371px", maxWidth: "268px" },
+		imgDiv: { maxWidth: "100%" },
 		image: { height: "100%", width: "100%" },
 	})
 );

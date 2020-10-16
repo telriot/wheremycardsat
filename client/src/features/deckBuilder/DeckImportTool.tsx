@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { fetchCardCollection } from "./deckBuilderSlice";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -89,9 +90,9 @@ function DeckImportTool() {
 	};
 
 	return (
-		<div>
+		<Box mb={3}>
 			<label>
-				<Button variant="contained" component="label">
+				<Button variant="contained" component="label" fullWidth>
 					<input
 						accept=".txt"
 						className={classes.input}
@@ -99,10 +100,10 @@ function DeckImportTool() {
 						type="file"
 						onChange={handleFileSelected}
 					/>
-					{isLoading ? "Loading..." : "Import"}
+					{isLoading ? "Loading..." : "Import from .txt"}
 				</Button>
 			</label>
-		</div>
+		</Box>
 	);
 }
 

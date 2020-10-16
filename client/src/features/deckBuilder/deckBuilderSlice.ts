@@ -12,7 +12,7 @@ const initialState: IDeckBuilderInitialState = {
 	mainDeckList: {},
 	mainDeckLength: 0,
 	deckName: "",
-	deckFormat: "",
+	deckFormat: "edh",
 };
 
 export const fetchIndividualCard = createAsyncThunk(
@@ -120,8 +120,8 @@ const deckBuilderSlice = createSlice({
 			const trimmedName = trimName(cardname);
 			state.mainDeckList[trimmedName].quantity += quantity;
 			state.mainDeckList[trimmedName].availability += quantity;
-
 			state.mainDeckLength += quantity;
+			state.saveStatus = "idle";
 		},
 		cardQuantityDecreased: (state, action) => {
 			const { cardname, quantity } = action.payload;
@@ -134,12 +134,15 @@ const deckBuilderSlice = createSlice({
 				state.mainDeckList[trimmedName].availability -= Math.abs(quantity);
 				state.mainDeckLength -= Math.abs(quantity);
 			}
+			state.saveStatus = "idle";
 		},
 		deckNameChanged: (state, action) => {
 			state.deckName = action.payload;
+			state.saveStatus = "idle";
 		},
 		formatChanged: (state, action) => {
 			state.deckFormat = action.payload;
+			state.saveStatus = "idle";
 		},
 	},
 
@@ -161,7 +164,6 @@ const deckBuilderSlice = createSlice({
 		});
 		builder.addCase(fetchCardCollection.fulfilled, (state, action) => {
 			state.mainDeckList = action.payload.decklist;
-			console.log("decklist payload", action.payload.decklist);
 			state.mainDeckLength = Object.values(action.payload.decklist).reduce(
 				(a: number, b: any) => {
 					const quantityB: number = ~~b.quantity;
@@ -170,6 +172,7 @@ const deckBuilderSlice = createSlice({
 				0
 			);
 			state.fetchCollectionStatus = "fulfilled";
+			state.saveStatus = "idle";
 		});
 		builder.addCase(fetchCardCollection.rejected, (state, action) => {
 			state.fetchCollectionStatus = "rejected";

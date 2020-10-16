@@ -3,11 +3,17 @@ import { IDeck, ISharedCard } from "../../declarations";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { moveCardsBetweenDecks } from "./myDecksSlice";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import {
+	makeStyles,
+	createStyles,
+	Theme,
+	withStyles,
+} from "@material-ui/core/styles";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
+import StyledTableCell from "../../components/StyledTableCell";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -109,15 +115,15 @@ function DeckDetailTableInnerRow({
 				onClick={handleMenuOpen}
 				key={sharedCard.deckName}
 			>
-				<TableCell component="th" scope="row">
+				<StyledTableCell component="th" scope="row">
 					{sharedCard.deckName}
-				</TableCell>
-				<TableCell className={classes.smallCell} align="right">
+				</StyledTableCell>
+				<StyledTableCell className={classes.smallCell} align="right">
 					{sharedCard.quantity}
-				</TableCell>
-				<TableCell className={classes.smallCell} align="right">
+				</StyledTableCell>
+				<StyledTableCell className={classes.smallCell} align="right">
 					{sharedCard.availability}
-				</TableCell>
+				</StyledTableCell>
 			</TableRow>
 			<Menu
 				keepMounted

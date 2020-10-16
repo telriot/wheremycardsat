@@ -2,8 +2,16 @@ import React from "react";
 import { ISharedCard, ICard, IDeck, IRouteParams } from "../../declarations";
 import { trimName } from "../../lib/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { selectMyDecks } from "./myDecksSlice";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { selectMyDecks, selectOnlyShared } from "./myDecksSlice";
+import {
+	createStyles,
+	makeStyles,
+	Theme,
+	useTheme,
+	withStyles,
+} from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+
 import { useParams } from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
@@ -17,6 +25,7 @@ import { SharedDataObj } from "../../lib/classes";
 import DeckDetailTableInnerTable from "./DeckDetailTableInnerTable";
 import clsx from "clsx";
 import ManaFont from "../../components/ManaFont";
+import StyledTableCell from "../../components/StyledTableCell";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -47,9 +56,17 @@ const useStyles = makeStyles((theme: Theme) =>
 				background: theme.palette.error.main,
 			},
 		},
+		manaCostCell: {
+			[theme.breakpoints.down("xs")]: {
+				fontSize: "11px",
+			},
+		},
 		innerTableMainCell: {
 			padding: `${theme.spacing(0, 6)} !important`,
 			background: theme.palette.action.hover,
+			[theme.breakpoints.down("xs")]: {
+				padding: `${theme.spacing(0, 3)} !important`,
+			},
 		},
 		iconButton: { padding: "1px" },
 	})
@@ -59,33 +76,35 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const decks = useSelector(selectMyDecks);
-	const params = useParams<IRouteParams>();
+	const onlyShared = useSelector(selectOnlyShared);
 
+	const params = useParams<IRouteParams>();
+	const theme = useTheme();
+	const isXXS = useMediaQuery(theme.breakpoints.down(400));
 	const [open, setOpen] = React.useState(false);
 	const [sharedDecks, setSharedDecks] = React.useState<Array<ISharedCard>>([]);
 
 	const isShared = Boolean(sharedDecks.length);
 	const isMissing = Boolean(isShared && card.availability < card.quantity);
-	const getSharedCardData = (
-		decks: Array<IDeck>,
-		presentDeckId: string,
-		cardname: string
-	) => {
-		return decks
-			.filter(
-				(deck) =>
-					deck._id !== presentDeckId && deck.deckList[trimName(cardname)]
-			)
-			.map((deck) => {
-				const card = deck.deckList[trimName(cardname)];
-				return new SharedDataObj(
-					deck._id,
-					deck.name,
-					card.quantity,
-					card.availability
-				);
-			});
-	};
+	const getSharedCardData = React.useCallback(
+		(decks: Array<IDeck>, presentDeckId: string, cardname: string) => {
+			return decks
+				.filter(
+					(deck) =>
+						deck._id !== presentDeckId && deck.deckList[trimName(cardname)]
+				)
+				.map((deck) => {
+					const card = deck.deckList[trimName(cardname)];
+					return new SharedDataObj(
+						deck._id,
+						deck.name,
+						card.quantity,
+						card.availability
+					);
+				});
+		},
+		[decks, deck, card]
+	);
 
 	const handleChangeClick = (
 		cardname: string,
@@ -105,7 +124,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const handleOpen = () => {
 		isShared && setOpen(!open);
 	};
-
+	if (onlyShared && !isShared) return null;
 	return (
 		<>
 			<TableRow
@@ -118,32 +137,38 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 				}
 				key={card.name}
 			>
-				<TableCell onClick={handleOpen} component="th" scope="row">
+				<StyledTableCell onClick={handleOpen} component="th" scope="row">
 					{card.name}
-				</TableCell>
-				<TableCell onClick={handleOpen} align="right">
-					<ManaFont manacost={card.mana_cost} />
-				</TableCell>
-				<TableCell align="center">
+				</StyledTableCell>
+				{isXXS ? null : (
+					<StyledTableCell
+						className={classes.manaCostCell}
+						onClick={handleOpen}
+						align="right"
+					>
+						<ManaFont manacost={card.mana_cost} />
+					</StyledTableCell>
+				)}
+				<StyledTableCell align="center">
 					<QuantityToggler
 						quantity={card.quantity}
 						cardname={card.name}
 						handleChangeClick={handleChangeClick}
 						target="quantity"
 					/>
-				</TableCell>
-				<TableCell align="center">
+				</StyledTableCell>
+				<StyledTableCell align="center">
 					<QuantityToggler
 						quantity={card.availability}
 						cardname={card.name}
 						handleChangeClick={handleChangeClick}
 						target="availability"
 					/>
-				</TableCell>
+				</StyledTableCell>
 			</TableRow>
 			{isShared && (
 				<TableRow>
-					<TableCell className={classes.innerTableMainCell} colSpan={5}>
+					<StyledTableCell className={classes.innerTableMainCell} colSpan={5}>
 						<Collapse in={open} timeout="auto" unmountOnExit>
 							<Box margin={1}>
 								<DeckDetailTableInnerTable
@@ -153,7 +178,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 								/>
 							</Box>
 						</Collapse>
-					</TableCell>
+					</StyledTableCell>
 				</TableRow>
 			)}
 		</>

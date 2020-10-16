@@ -34,15 +34,17 @@ function DeckCard({ deck }: { deck: any }) {
 		history.push(`/my-decks/${deck._id}`);
 	};
 	const handleDelete = () => {
-		dispatch(deleteDeck(deck._id));
+		if (window.confirm(`Do you really want to delete ${deck.name}?`)) {
+			dispatch(deleteDeck(deck._id));
+		}
 	};
 
 	return (
 		<Card className={classes.root}>
-			<CardActionArea>
+			<CardActionArea onClick={handleView}>
 				<CardMedia
 					className={classes.media}
-					image={deck.deckList[firstCardName].image_uris.normal}
+					image={deck.deckList[firstCardName].image_uris.art_crop}
 					title={deck.name}
 				/>
 				<CardContent>
@@ -58,7 +60,7 @@ function DeckCard({ deck }: { deck: any }) {
 				<Button onClick={handleView} size="small" color="primary">
 					View
 				</Button>
-				<Button onClick={handleDelete} size="small" color="primary">
+				<Button onClick={handleDelete} size="small" color="secondary">
 					Delete
 				</Button>
 			</CardActions>

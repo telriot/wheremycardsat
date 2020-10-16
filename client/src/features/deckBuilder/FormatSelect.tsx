@@ -48,9 +48,6 @@ export default function NativeSelects() {
 				onChange={handleChange}
 				label="Format"
 			>
-				<MenuItem value="">
-					<em>None</em>
-				</MenuItem>
 				{formats.map((format) => (
 					<MenuItem key={`format-${format.name}`} value={format.name}>
 						{format.display}

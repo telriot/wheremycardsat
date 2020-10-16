@@ -4,7 +4,7 @@ export type TTimeframe = "day" | "week" | "month" | "all" | "archived";
 export interface ICard {
 	name: string;
 	mana_cost: string[];
-	image_uris: Array<{ small: string; normal: string }>;
+	image_uris: Array<{ small: string; normal: string; art_crop?: string }>;
 	type_line: string;
 	quantity: number;
 	availability: number;
@@ -18,6 +18,8 @@ export interface IDeck {
 export interface IRouteParams {
 	id: string;
 }
+export type TSortOrder = "name" | "manacost";
+
 export interface ISharedCard {
 	deckID: string;
 	deckName: string;
@@ -63,6 +65,7 @@ export interface IMyDecksInitialState {
 	status: TStatus;
 	error: string;
 	decks: Array<any>;
+	onlyShared: boolean;
 }
 
 export interface IUsersInitialState {

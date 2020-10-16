@@ -4,10 +4,18 @@ import { selectDeckName, deckNameChanged } from "./deckBuilderSlice";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({}));
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		container: {
+			[theme.breakpoints.down("xs")]: {
+				paddingRight: theme.spacing(1),
+			},
+		},
+	})
+);
 
 function DeckNameInput() {
-	const classes = useStyles;
+	const classes = useStyles();
 	const dispatch = useDispatch();
 	const deckName = useSelector(selectDeckName);
 
@@ -16,7 +24,7 @@ function DeckNameInput() {
 	};
 
 	return (
-		<div>
+		<div className={classes.container}>
 			<TextField
 				error={false}
 				value={deckName}

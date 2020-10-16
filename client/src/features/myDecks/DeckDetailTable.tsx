@@ -1,10 +1,23 @@
 import React from "react";
-import { IDeck, IRouteParams } from "../../declarations/index";
-import { useParams } from "react-router-dom";
+import {
+	IDeck,
+	IRouteParams,
+	ICard,
+	TSortOrder,
+} from "../../declarations/index";
+import { sortCardsByParam } from "../../lib/helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuthorizedUser } from "../auth/authSlice";
-import { fetchMyDecks, selectMyDecks } from "./myDecksSlice";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { fetchMyDecks, selectMyDecks, selectOnlyShared } from "./myDecksSlice";
+import {
+	createStyles,
+	makeStyles,
+	Theme,
+	useTheme,
+	withStyles,
+} from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -13,58 +26,81 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import DeckDetailTableRow from "./DeckDetailTableRow";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import StyledTableCell from "../../components/StyledTableCell";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
+		container: { marginBottom: theme.spacing(3) },
 		table: {
-			minWidth: 350,
+			minWidth: 320,
 		},
-		quantityCell: {
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "space-around",
-			height: "16px",
+		setterCell: {
+			color: theme.palette.primary.main,
+			cursor: "pointer",
+			transition: "color .15s",
+			minWidth: "7rem",
+			"&:hover, &:focus": {
+				color: theme.palette.primary.dark,
+			},
 		},
+
 		iconButton: { padding: "1px" },
 	})
 );
-
-function DeckDetailTable() {
+function DeckDetailTable({ deck }: { deck: IDeck }) {
 	const classes = useStyles();
-	const dispatch = useDispatch();
-	const params = useParams<IRouteParams>();
+	const theme = useTheme();
+	const isXS = useMediaQuery(theme.breakpoints.down("xs"));
+	const isXXS = useMediaQuery(theme.breakpoints.down(400));
+	const [sortOrder, setSortOrder] = React.useState<TSortOrder>("name");
 
-	const authUser = useSelector(selectAuthorizedUser);
-	const decks = useSelector(selectMyDecks);
-
-	const [deck, setDeck] = React.useState<IDeck | undefined>(undefined);
-
-	React.useEffect(() => {
-		if (!decks?.length && authUser) {
-			dispatch(fetchMyDecks());
-		}
-	}, [decks, authUser, dispatch]);
-
-	React.useEffect(() => {
-		decks?.length && setDeck(decks.find((deck) => deck._id === params.id));
-	}, [decks, params]);
+	const handleSetSort = (criteria: TSortOrder) => () => {
+		setSortOrder(criteria);
+	};
 
 	return (
-		<TableContainer component={Paper}>
+		<TableContainer className={classes.container} component={Paper}>
 			<Table className={classes.table} size="small" aria-label="Deck table">
 				<TableHead>
 					<TableRow>
-						<TableCell>Card name</TableCell>
-						<TableCell align="right">Mana Cost</TableCell>
-						<TableCell align="center"># In Decklist</TableCell>
-						<TableCell align="center"># In Deck</TableCell>
+						<StyledTableCell
+							className={classes.setterCell}
+							onClick={handleSetSort("name")}
+						>
+							<Box display="flex" alignItems="center">
+								Card name {sortOrder === "name" && <ArrowDropDownIcon />}
+							</Box>
+						</StyledTableCell>
+						{isXXS ? null : (
+							<StyledTableCell
+								className={classes.setterCell}
+								onClick={handleSetSort("manacost")}
+								align="right"
+							>
+								<Box
+									display="flex"
+									alignItems="center"
+									justifyContent="flex-end"
+								>
+									Mana Cost{sortOrder === "manacost" && <ArrowDropDownIcon />}{" "}
+								</Box>
+							</StyledTableCell>
+						)}
+						<StyledTableCell align="center">
+							{isXS ? "List" : "# In Decklist"}
+						</StyledTableCell>
+						<StyledTableCell align="center">
+							{isXS ? "Deck" : "# In Deck"}
+						</StyledTableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{deck &&
-						Object.entries(deck.deckList).map(([_, cardObject]: any) => {
-							return <DeckDetailTableRow card={cardObject} deck={deck} />;
-						})}
+					{sortCardsByParam(Object.values(deck.deckList), sortOrder)!.map(
+						(card: any) => {
+							return <DeckDetailTableRow card={card} deck={deck} />;
+						}
+					)}
 				</TableBody>
 			</Table>
 		</TableContainer>

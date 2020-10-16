@@ -41,15 +41,7 @@ const useStyles = makeStyles((theme: AugmentedTheme) =>
 	})
 );
 let theme = createMuiTheme({
-	palette: {
-		primary: {
-			main: "#34BAFF",
-		},
-		secondary: {
-			main: "#000",
-			light: grey[400],
-		},
-	},
+	palette: {},
 	typography: {
 		h2: {
 			fontWeight: 500,

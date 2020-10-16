@@ -9,8 +9,10 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		container: { maxWidth: "48rem" },
-		autocompleteDiv: { width: "300px" },
+		autocompleteDiv: {
+			width: "100%",
+			marginBottom: theme.spacing(1),
+		},
 	})
 );
 

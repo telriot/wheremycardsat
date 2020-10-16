@@ -33,7 +33,8 @@ function QuantityToggler({
 	return (
 		<Box
 			height={16}
-			width={70}
+			width="100%"
+			minWidth={70}
 			display="flex"
 			alignItems="center"
 			justifyContent="space-around"

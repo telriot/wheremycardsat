@@ -8,11 +8,18 @@ const useStyles = makeStyles((theme: Theme) =>
 		input: { display: "none" },
 	})
 );
-function DeckLength() {
+function DeckLength({ variant }: { variant?: "main" | "side" | "default" }) {
 	const mainDeckLength = useSelector(selectMainDeckLength);
 	return (
 		<div>
-			<Typography>Main: {mainDeckLength} cards</Typography>
+			<Typography>
+				{variant === "main"
+					? "Mainboard: "
+					: variant === "side"
+					? "Sideboard: "
+					: "Deck: "}{" "}
+				{mainDeckLength} cards
+			</Typography>
 		</div>
 	);
 }

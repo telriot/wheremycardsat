@@ -6,6 +6,7 @@ const initialState: IMyDecksInitialState = {
 	status: "idle",
 	error: "",
 	decks: [],
+	onlyShared: false,
 };
 interface ISwapObj {
 	deckID: string;
@@ -81,7 +82,11 @@ export const moveCardsBetweenDecks = createAsyncThunk(
 const myDecksSlice = createSlice({
 	name: "myDecks",
 	initialState,
-	reducers: {},
+	reducers: {
+		onlySharedToggled: (state, action) => {
+			state.onlyShared = action.payload;
+		},
+	},
 
 	extraReducers: (builder) => {
 		builder.addCase(fetchMyDecks.pending, (state, action) => {
@@ -132,7 +137,8 @@ const myDecksSlice = createSlice({
 	},
 });
 
-export const {} = myDecksSlice.actions;
+export const { onlySharedToggled } = myDecksSlice.actions;
 export const selectMyDecks = (state: IStore) => state.myDecks.decks;
+export const selectOnlyShared = (state: IStore) => state.myDecks.onlyShared;
 
 export default myDecksSlice.reducer;
