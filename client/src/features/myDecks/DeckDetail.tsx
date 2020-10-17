@@ -44,20 +44,6 @@ function DeckDetail() {
 		decks?.length && setDeck(decks.find((deck) => deck._id === params.id));
 	}, [decks, params]);
 
-	const ContentLoaded = ({ deck }: { deck: IDeck }) => (
-		<>
-			<Box
-				display="flex"
-				justifyContent="space-between"
-				alignItems="flex-start"
-			>
-				<DeckInfo deck={deck} />
-				<OnlySharedSwitch />
-			</Box>
-			<DeckDetailTable deck={deck} />
-		</>
-	);
-
 	const ContentPending = () => (
 		<LinearProgress className={classes.linearProgress} />
 	);
@@ -67,8 +53,18 @@ function DeckDetail() {
 
 	return (
 		<Container className={classes.container}>
-			{status === "fulfilled" && deck ? (
-				<ContentLoaded deck={deck} />
+			{deck && status === "fulfilled" ? (
+				<>
+					<Box
+						display="flex"
+						justifyContent="space-between"
+						alignItems="flex-start"
+					>
+						<DeckInfo deck={deck} />
+						<OnlySharedSwitch />
+					</Box>
+					<DeckDetailTable deck={deck} />
+				</>
 			) : status === "pending" ? (
 				<ContentPending />
 			) : status === "rejected" ? (

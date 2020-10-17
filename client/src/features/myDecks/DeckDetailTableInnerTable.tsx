@@ -15,7 +15,7 @@ function DeckDetailTableInnerTable({
 	card,
 }: {
 	deck: IDeck;
-	sharedDecks: Array<ISharedCard>;
+	sharedDecks?: Array<ISharedCard>;
 	card: ICard;
 }) {
 	const classes = useStyles();
@@ -32,7 +32,7 @@ function DeckDetailTableInnerTable({
 					</StyledTableCell>
 				</TableRow>
 			</TableHead>
-			{sharedDecks.map((sharedCard) => (
+			{sharedDecks?.map((sharedCard) => (
 				<DeckDetailTableInnerRow
 					key={`${sharedCard.deckName}-${card.name}`}
 					cardname={card.name}

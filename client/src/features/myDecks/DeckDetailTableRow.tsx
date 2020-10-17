@@ -57,12 +57,20 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const theme = useTheme();
 	const isXXS = useMediaQuery(theme.breakpoints.down(400));
 	const [open, setOpen] = React.useState(false);
-	const [sharedDecks, setSharedDecks] = React.useState<Array<ISharedCard>>([]);
-	const isShared = Boolean(sharedDecks.length);
-	const isSomewhereElse = Boolean(
-		isShared && card.availability < card.quantity
+	const [sharedDecks, setSharedDecks] = React.useState<
+		Array<ISharedCard> | undefined
+	>(undefined);
+
+	const isShared = Boolean(sharedDecks?.length);
+	const isSharedAndFull = Boolean(
+		sharedDecks?.length && card.availability >= card.quantity
 	);
-	const isMissing = Boolean(!isShared && card.availability < card.quantity);
+	const isSomewhereElse = Boolean(
+		sharedDecks?.length && card.availability < card.quantity
+	);
+	const isMissing = Boolean(
+		sharedDecks?.length === 0 && card.availability < card.quantity
+	);
 	const isBeingEdited = Boolean(beingEdited === card.name);
 
 	const getSharedCardData = React.useCallback(
@@ -82,7 +90,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 					);
 				});
 		},
-		[decks, deck, card]
+		[]
 	);
 
 	const handleChangeClick = (
@@ -101,7 +109,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 
 	React.useEffect(() => {
 		decks && setSharedDecks(getSharedCardData(decks, params.id, card.name));
-	}, [decks, params.id, card.name]);
+	}, [decks, params.id, card.name, getSharedCardData]);
 
 	const handleOpen = () => {
 		isShared && setOpen(!open);
@@ -112,10 +120,12 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	return (
 		<>
 			<ColorReactiveTableRow
-				isMissing={isMissing}
-				isShared={isShared}
-				isBeingEdited={isBeingEdited}
-				isSomewhereElse={isSomewhereElse}
+				sharedDecks={sharedDecks}
+				card={card}
+				// isSharedAndFull={isSharedAndFull}
+				// isSomewhereElse={isSomewhereElse}
+				// isMissing={isMissing}
+				// isBeingEdited={isBeingEdited}
 			>
 				<StyledTableCell onClick={handleOpen} component="th" scope="row">
 					{card.name}

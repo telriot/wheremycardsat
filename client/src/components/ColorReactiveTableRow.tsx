@@ -1,7 +1,10 @@
 import React from "react";
+import { ICard, ISharedCard } from "../declarations/index";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
 import clsx from "clsx";
+import { useSelector } from "react-redux";
+import { selectBeingEdited } from "../features/myDecks/myDecksSlice";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -61,23 +64,38 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 interface IColorReactiveTableRowProps {
 	children: React.ReactNode;
-	isSomewhereElse?: boolean;
-	isMissing?: boolean;
-	isShared?: boolean;
-	isBeingEdited?: boolean;
+	sharedDecks?: Array<ISharedCard>;
+	card: ICard;
 }
 function ColorReactiveTableRow({
 	children,
-	isMissing,
-	isShared,
-	isBeingEdited,
-	isSomewhereElse,
+	sharedDecks,
+	card,
 }: IColorReactiveTableRowProps) {
 	const classes = useStyles();
+	const beingEdited = useSelector(selectBeingEdited);
+
+	const isSharedAndFull = Boolean(
+		sharedDecks?.length && card.availability >= card.quantity
+	);
+	const isSomewhereElse = Boolean(
+		sharedDecks?.length && card.availability < card.quantity
+	);
+	const isMissing = Boolean(
+		sharedDecks?.length === 0 && card.availability < card.quantity
+	);
+	const isBeingEdited = Boolean(beingEdited === card.name);
+
 	return (
 		<TableRow
 			className={
-				isSomewhereElse
+				isSharedAndFull
+					? clsx([
+							classes.row,
+							classes.rowShared,
+							isBeingEdited && classes.rowBeingEdited,
+					  ])
+					: isSomewhereElse
 					? clsx([
 							classes.row,
 							classes.rowShared,
@@ -88,12 +106,6 @@ function ColorReactiveTableRow({
 					? clsx([
 							classes.row,
 							classes.rowMissing,
-							isBeingEdited && classes.rowBeingEdited,
-					  ])
-					: isShared
-					? clsx([
-							classes.row,
-							classes.rowShared,
 							isBeingEdited && classes.rowBeingEdited,
 					  ])
 					: clsx([classes.row, isBeingEdited && classes.rowBeingEdited])

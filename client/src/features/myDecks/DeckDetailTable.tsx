@@ -1,20 +1,11 @@
 import React from "react";
-import {
-	IDeck,
-	IRouteParams,
-	ICard,
-	TSortOrder,
-} from "../../declarations/index";
+import { IDeck, TSortOrder } from "../../declarations/index";
 import { sortCardsByParam } from "../../lib/helpers";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAuthorizedUser } from "../auth/authSlice";
-import { fetchMyDecks, selectMyDecks, selectOnlyShared } from "./myDecksSlice";
 import {
 	createStyles,
 	makeStyles,
 	Theme,
 	useTheme,
-	withStyles,
 } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Box from "@material-ui/core/Box";
@@ -49,6 +40,8 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 );
 function DeckDetailTable({ deck }: { deck: IDeck }) {
+	console.log("refresh");
+
 	const classes = useStyles();
 	const theme = useTheme();
 	const isXS = useMediaQuery(theme.breakpoints.down("xs"));
