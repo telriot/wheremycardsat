@@ -10,6 +10,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { useDispatch } from "react-redux";
 import { deleteDeck } from "./myDecksSlice";
+import DeckInfo from "./DeckInfo";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -48,12 +49,7 @@ function DeckCard({ deck }: { deck: any }) {
 					title={deck.name}
 				/>
 				<CardContent>
-					<Typography gutterBottom variant="h5" component="h2">
-						{deck.name}
-					</Typography>
-					<Typography variant="body2" color="textSecondary" component="p">
-						{deck.format}
-					</Typography>
+					<DeckInfo deck={deck} small />
 				</CardContent>
 			</CardActionArea>
 			<CardActions>

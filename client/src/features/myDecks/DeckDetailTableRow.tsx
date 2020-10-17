@@ -2,7 +2,12 @@ import React from "react";
 import { ISharedCard, ICard, IDeck, IRouteParams } from "../../declarations";
 import { trimName } from "../../lib/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { selectMyDecks, selectOnlyShared } from "./myDecksSlice";
+import {
+	isEditingSingleToggled,
+	selectBeingEdited,
+	selectMyDecks,
+	selectOnlyShared,
+} from "./myDecksSlice";
 import {
 	createStyles,
 	makeStyles,
@@ -30,6 +35,7 @@ import StyledTableCell from "../../components/StyledTableCell";
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		row: {
+			transition: "background .5s",
 			"& button": {
 				display: "none",
 			},
@@ -56,6 +62,21 @@ const useStyles = makeStyles((theme: Theme) =>
 				background: theme.palette.error.main,
 			},
 		},
+		rowBeingEdited: {
+			backgroundRepeat: "no-repeat",
+			animation: `$mutatingBackgroundAnimation 2s infinite ease-in-out`,
+		},
+		"@keyframes mutatingBackgroundAnimation": {
+			"0%": {
+				background: "",
+			},
+			"50%": {
+				background: theme.palette.action.disabledBackground,
+			},
+			"100%": {
+				background: "",
+			},
+		},
 		manaCostCell: {
 			[theme.breakpoints.down("xs")]: {
 				fontSize: "11px",
@@ -75,6 +96,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
+	const beingEdited = useSelector(selectBeingEdited);
 	const decks = useSelector(selectMyDecks);
 	const onlyShared = useSelector(selectOnlyShared);
 
@@ -83,9 +105,10 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const isXXS = useMediaQuery(theme.breakpoints.down(400));
 	const [open, setOpen] = React.useState(false);
 	const [sharedDecks, setSharedDecks] = React.useState<Array<ISharedCard>>([]);
-
 	const isShared = Boolean(sharedDecks.length);
 	const isMissing = Boolean(isShared && card.availability < card.quantity);
+	const isBeingEdited = Boolean(beingEdited === card.name);
+
 	const getSharedCardData = React.useCallback(
 		(decks: Array<IDeck>, presentDeckId: string, cardname: string) => {
 			return decks
@@ -110,30 +133,44 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 		cardname: string,
 		num: number,
 		target: TQuantityTogglerTarget
-	) => () =>
+	) => () => {
+		dispatch(isEditingSingleToggled(cardname));
 		dispatch(
 			updateDeck({
 				deckID: deck._id,
 				update: { cardname, [target]: card[target] + num },
 			})
 		);
+	};
 
 	React.useEffect(() => {
 		decks && setSharedDecks(getSharedCardData(decks, params.id, card.name));
 	}, [decks, params.id, card.name]);
+
 	const handleOpen = () => {
 		isShared && setOpen(!open);
 	};
+
 	if (onlyShared && !isShared) return null;
+
 	return (
 		<>
 			<TableRow
 				className={
 					isMissing
-						? clsx([classes.row, classes.rowShared, classes.rowMissing])
+						? clsx([
+								classes.row,
+								classes.rowShared,
+								classes.rowMissing,
+								isBeingEdited && classes.rowBeingEdited,
+						  ])
 						: isShared
-						? clsx([classes.row, classes.rowShared])
-						: classes.row
+						? clsx([
+								classes.row,
+								classes.rowShared,
+								isBeingEdited && classes.rowBeingEdited,
+						  ])
+						: clsx([classes.row, isBeingEdited && classes.rowBeingEdited])
 				}
 				key={card.name}
 			>

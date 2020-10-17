@@ -4,6 +4,9 @@ import axios from "axios";
 
 const initialState: IMyDecksInitialState = {
 	status: "idle",
+	decksStatus: "idle",
+	singleCardEditStatus: "idle",
+	beingEdited: "",
 	error: "",
 	decks: [],
 	onlyShared: false,
@@ -86,18 +89,21 @@ const myDecksSlice = createSlice({
 		onlySharedToggled: (state, action) => {
 			state.onlyShared = action.payload;
 		},
+		isEditingSingleToggled: (state, action) => {
+			state.beingEdited = action.payload;
+		},
 	},
 
 	extraReducers: (builder) => {
 		builder.addCase(fetchMyDecks.pending, (state, action) => {
-			state.status = "pending";
+			state.decksStatus = "pending";
 		});
 		builder.addCase(fetchMyDecks.fulfilled, (state, action) => {
 			state.decks = action.payload.decks;
-			state.status = "fulfilled";
+			state.decksStatus = "fulfilled";
 		});
 		builder.addCase(fetchMyDecks.rejected, (state, action) => {
-			state.status = "rejected";
+			state.decksStatus = "rejected";
 			console.log(action);
 			state.error = "Something went wrong with our servers";
 		});
@@ -114,14 +120,17 @@ const myDecksSlice = createSlice({
 		});
 		builder.addCase(moveCardsBetweenDecks.pending, (state, action) => {
 			state.status = "pending";
+			state.beingEdited = "";
 		});
 		builder.addCase(moveCardsBetweenDecks.fulfilled, (state, action) => {
 			state.decks = action.payload.decks;
 			state.status = "fulfilled";
+			state.beingEdited = "";
 		});
 		builder.addCase(moveCardsBetweenDecks.rejected, (state, action) => {
 			state.status = "rejected";
 			state.error = "Something went wrong with our servers";
+			state.beingEdited = "";
 		});
 		builder.addCase(updateDeck.pending, (state, action) => {
 			state.status = "pending";
@@ -129,16 +138,22 @@ const myDecksSlice = createSlice({
 		builder.addCase(updateDeck.fulfilled, (state, action) => {
 			state.decks = action.payload.decks;
 			state.status = "fulfilled";
+			state.beingEdited = "";
 		});
 		builder.addCase(updateDeck.rejected, (state, action) => {
 			state.status = "rejected";
 			state.error = "Something went wrong with our servers";
+			state.beingEdited = "";
 		});
 	},
 });
 
-export const { onlySharedToggled } = myDecksSlice.actions;
+export const {
+	onlySharedToggled,
+	isEditingSingleToggled,
+} = myDecksSlice.actions;
 export const selectMyDecks = (state: IStore) => state.myDecks.decks;
 export const selectOnlyShared = (state: IStore) => state.myDecks.onlyShared;
-
+export const selectDecksStatus = (state: IStore) => state.myDecks.decksStatus;
+export const selectBeingEdited = (state: IStore) => state.myDecks.beingEdited;
 export default myDecksSlice.reducer;

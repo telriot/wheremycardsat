@@ -42,17 +42,7 @@ const useStyles = makeStyles((theme: AugmentedTheme) =>
 );
 let theme = createMuiTheme({
 	palette: {},
-	typography: {
-		h2: {
-			fontWeight: 500,
-		},
-		h3: {
-			fontWeight: 700,
-		},
-		h4: {
-			fontWeight: 700,
-		},
-	},
+	typography: {},
 });
 theme = responsiveFontSizes(theme);
 
