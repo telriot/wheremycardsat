@@ -2,7 +2,7 @@ import React from "react";
 import { IDeck, ISharedCard } from "../../declarations";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { moveCardsBetweenDecks } from "./myDecksSlice";
+import { isEditingSingleToggled, moveCardsBetweenDecks } from "./myDecksSlice";
 import {
 	makeStyles,
 	createStyles,
@@ -84,6 +84,7 @@ function DeckDetailTableInnerRow({
 			cardname,
 			availability: sharedCard.availability + num,
 		};
+		dispatch(isEditingSingleToggled(cardname));
 		dispatch(moveCardsBetweenDecks([originUpdate, destinationUpdate]));
 		handleClose();
 	};
@@ -100,6 +101,8 @@ function DeckDetailTableInnerRow({
 			cardname,
 			availability: sharedCard.availability - num,
 		};
+		console.log(cardname);
+		dispatch(isEditingSingleToggled(cardname));
 		dispatch(moveCardsBetweenDecks([originUpdate, destinationUpdate]));
 		handleClose();
 	};

@@ -16,11 +16,9 @@ import {
 	withStyles,
 } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-
 import { useParams } from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
-import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import QuantityToggler, {
 	TQuantityTogglerTarget,
@@ -28,55 +26,11 @@ import QuantityToggler, {
 import { updateDeck } from "./myDecksSlice";
 import { SharedDataObj } from "../../lib/classes";
 import DeckDetailTableInnerTable from "./DeckDetailTableInnerTable";
-import clsx from "clsx";
 import ManaFont from "../../components/ManaFont";
 import StyledTableCell from "../../components/StyledTableCell";
-
+import ColorReactiveTableRow from "../../components/ColorReactiveTableRow";
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		row: {
-			transition: "background .5s",
-			"& button": {
-				display: "none",
-			},
-			"&:hover, &:focus ": {
-				background: theme.palette.action.hover,
-				"& button": {
-					display: "flex",
-				},
-			},
-		},
-		rowShared: {
-			"& > *": {
-				borderBottom: "unset",
-			},
-			background: theme.palette.success.light,
-			"&:hover, &:focus ": {
-				background: theme.palette.success.main,
-			},
-			cursor: "pointer",
-		},
-		rowMissing: {
-			background: theme.palette.error.light,
-			"&:hover, &:focus ": {
-				background: theme.palette.error.main,
-			},
-		},
-		rowBeingEdited: {
-			backgroundRepeat: "no-repeat",
-			animation: `$mutatingBackgroundAnimation 2s infinite ease-in-out`,
-		},
-		"@keyframes mutatingBackgroundAnimation": {
-			"0%": {
-				background: "",
-			},
-			"50%": {
-				background: theme.palette.action.disabledBackground,
-			},
-			"100%": {
-				background: "",
-			},
-		},
 		manaCostCell: {
 			[theme.breakpoints.down("xs")]: {
 				fontSize: "11px",
@@ -106,7 +60,10 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const [open, setOpen] = React.useState(false);
 	const [sharedDecks, setSharedDecks] = React.useState<Array<ISharedCard>>([]);
 	const isShared = Boolean(sharedDecks.length);
-	const isMissing = Boolean(isShared && card.availability < card.quantity);
+	const isSomewhereElse = Boolean(
+		isShared && card.availability < card.quantity
+	);
+	const isMissing = Boolean(!isShared && card.availability < card.quantity);
 	const isBeingEdited = Boolean(beingEdited === card.name);
 
 	const getSharedCardData = React.useCallback(
@@ -155,24 +112,11 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 
 	return (
 		<>
-			<TableRow
-				className={
-					isMissing
-						? clsx([
-								classes.row,
-								classes.rowShared,
-								classes.rowMissing,
-								isBeingEdited && classes.rowBeingEdited,
-						  ])
-						: isShared
-						? clsx([
-								classes.row,
-								classes.rowShared,
-								isBeingEdited && classes.rowBeingEdited,
-						  ])
-						: clsx([classes.row, isBeingEdited && classes.rowBeingEdited])
-				}
-				key={card.name}
+			<ColorReactiveTableRow
+				isMissing={isMissing}
+				isShared={isShared}
+				isBeingEdited={isBeingEdited}
+				isSomewhereElse={isSomewhereElse}
 			>
 				<StyledTableCell onClick={handleOpen} component="th" scope="row">
 					{card.name}
@@ -202,7 +146,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 						target="availability"
 					/>
 				</StyledTableCell>
-			</TableRow>
+			</ColorReactiveTableRow>{" "}
 			{isShared && (
 				<TableRow>
 					<StyledTableCell className={classes.innerTableMainCell} colSpan={5}>

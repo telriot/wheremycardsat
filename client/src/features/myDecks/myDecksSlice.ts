@@ -120,7 +120,6 @@ const myDecksSlice = createSlice({
 		});
 		builder.addCase(moveCardsBetweenDecks.pending, (state, action) => {
 			state.status = "pending";
-			state.beingEdited = "";
 		});
 		builder.addCase(moveCardsBetweenDecks.fulfilled, (state, action) => {
 			state.decks = action.payload.decks;
