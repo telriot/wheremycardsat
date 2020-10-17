@@ -1,10 +1,8 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { onlySharedToggled, selectOnlyShared } from "./myDecksSlice";
 import clsx from "clsx";
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -13,35 +11,34 @@ const useStyles = makeStyles((theme: Theme) =>
 			color: theme.palette.text.secondary,
 			transition: "color .2s",
 		},
-		isOnlyShared: { color: theme.palette.primary.main },
+		isOpen: { color: theme.palette.text.primary },
 	})
 );
-
-function OnlySharedSwitch() {
+interface ISwitchProps {
+	handleChange: () => void;
+	open: boolean;
+	label: string;
+	color?: "default" | "primary" | "secondary";
+}
+function SharedSwitch({ handleChange, open, label, color }: ISwitchProps) {
 	const classes = useStyles();
-	const dispatch = useDispatch();
-	const onlyShared = useSelector(selectOnlyShared);
-	const handleChange = () => dispatch(onlySharedToggled(!onlyShared));
+
 	return (
 		<FormGroup row>
 			<FormControlLabel
-				className={
-					onlyShared
-						? clsx([classes.label, classes.isOnlyShared])
-						: classes.label
-				}
+				className={open ? clsx([classes.label, classes.isOpen]) : classes.label}
 				control={
 					<Switch
-						checked={onlyShared}
+						checked={open}
 						onChange={handleChange}
 						name="checkedB"
-						color="primary"
+						color={color || "primary"}
 					/>
 				}
-				label="Only shared"
+				label={label}
 			/>
 		</FormGroup>
 	);
 }
 
-export default OnlySharedSwitch;
+export default SharedSwitch;

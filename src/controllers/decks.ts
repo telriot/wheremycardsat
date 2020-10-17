@@ -40,6 +40,57 @@ export const updateDeck = async (
 		.status(200)
 		.json({ message: "Deck succesfully updated", updatedDecks: user.decks });
 };
+export const addCardToDeck = async (
+	req: IRequestWithUser,
+	res: Response,
+	next: NextFunction
+) => {
+	console.log(req.body);
+	const cardObj = req.body;
+	const deck = await Deck.findById(req.params.id);
+	if (!deck) {
+		res.status(404).send("No deck to update");
+		return;
+	}
+	deck.set(`deckList.${cardObj.name}`, cardObj);
+	await deck.save();
+
+	const user = await User.findById(deck.author).populate("decks").exec();
+	if (!user) {
+		res.status(404).send("No user to be found");
+		return;
+	}
+	res
+		.status(200)
+		.json({ message: "Deck succesfully updated", updatedDecks: user.decks });
+};
+
+export const removeCardFromDeck = async (
+	req: IRequestWithUser,
+	res: Response,
+	next: NextFunction
+) => {
+	console.log(req.body);
+	const { cardname } = req.body;
+	console.log(cardname);
+	const deck = await Deck.findById(req.params.id);
+	if (!deck) {
+		res.status(404).send("No deck to update");
+		return;
+	}
+	console.log(deck.deckList[cardname]);
+	deck.set(`deckList.${cardname}`, undefined);
+	await deck.save();
+
+	const user = await User.findById(deck.author).populate("decks").exec();
+	if (!user) {
+		res.status(404).send("No user to be found");
+		return;
+	}
+	res
+		.status(200)
+		.json({ message: "Deck succesfully updated", updatedDecks: user.decks });
+};
 
 export const moveCardsBetweenDecks = async (
 	req: IRequestWithUser,

@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	isEditingSingleToggled,
-	selectBeingEdited,
+	removeCardFromDeck,
 	selectMyDecks,
 	selectOnlyShared,
 	updateDeck,
@@ -49,7 +49,6 @@ const useStyles = makeStyles((theme: Theme) =>
 function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const beingEdited = useSelector(selectBeingEdited);
 	const decks = useSelector(selectMyDecks);
 	const onlyShared = useSelector(selectOnlyShared);
 
@@ -62,16 +61,6 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 	>(undefined);
 
 	const isShared = Boolean(sharedDecks?.length);
-	const isSharedAndFull = Boolean(
-		sharedDecks?.length && card.availability >= card.quantity
-	);
-	const isSomewhereElse = Boolean(
-		sharedDecks?.length && card.availability < card.quantity
-	);
-	const isMissing = Boolean(
-		sharedDecks?.length === 0 && card.availability < card.quantity
-	);
-	const isBeingEdited = Boolean(beingEdited === card.name);
 
 	const getSharedCardData = React.useCallback(
 		(decks: Array<IDeck>, presentDeckId: string, cardname: string) => {
@@ -98,6 +87,15 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 		num: number,
 		target: TQuantityTogglerTarget
 	) => () => {
+		if (target === "quantity" && card[target] + num < 0) {
+			if (
+				window.confirm(`Do you want to remove ${cardname} from your decklist?`)
+			) {
+				dispatch(isEditingSingleToggled(cardname));
+				dispatch(removeCardFromDeck({ deckID: deck._id, cardname: cardname }));
+			}
+			return;
+		}
 		dispatch(isEditingSingleToggled(cardname));
 		dispatch(
 			updateDeck({
@@ -119,14 +117,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 
 	return (
 		<>
-			<ColorReactiveTableRow
-				sharedDecks={sharedDecks}
-				card={card}
-				// isSharedAndFull={isSharedAndFull}
-				// isSomewhereElse={isSomewhereElse}
-				// isMissing={isMissing}
-				// isBeingEdited={isBeingEdited}
-			>
+			<ColorReactiveTableRow sharedDecks={sharedDecks} card={card}>
 				<StyledTableCell onClick={handleOpen} component="th" scope="row">
 					{card.name}
 				</StyledTableCell>
@@ -145,6 +136,7 @@ function DeckDetailTableRow({ card, deck }: { card: ICard; deck: IDeck }) {
 						cardname={card.name}
 						handleChangeClick={handleChangeClick}
 						target="quantity"
+						doNotDisable
 					/>
 				</StyledTableCell>
 				<StyledTableCell align="center">

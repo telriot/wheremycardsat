@@ -1,7 +1,13 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { openedAuthDialog } from "../auth/authSlice";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import {
+	makeStyles,
+	createStyles,
+	Theme,
+	useTheme,
+} from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
@@ -15,11 +21,20 @@ import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		container: { maxWidth: "60rem" },
-		icon: { fontSize: "8rem", color: theme.palette.secondary.light },
+		xsSubtitle: { paddingTop: theme.spacing(3) },
+		icon: {
+			fontSize: "8rem",
+			color: theme.palette.secondary.light,
+			[theme.breakpoints.down("xs")]: {
+				fontSize: "3rem",
+			},
+		},
 	})
 );
 function LandingPage() {
 	const classes = useStyles();
+	const theme = useTheme();
+	const isXS = useMediaQuery(theme.breakpoints.down("xs"));
 	const dispatch = useDispatch();
 	const handleLogin = async () => {
 		dispatch(openedAuthDialog());
@@ -28,15 +43,15 @@ function LandingPage() {
 	const actionBoxes = [
 		{
 			icon: <PlaylistAddIcon className={classes.icon} />,
-			text: "Import or create your decks",
+			text: isXS ? "Import" : "Import or create your decks",
 		},
 		{
 			icon: <ViewListIcon className={classes.icon} />,
-			text: "Explore their contents and see what they share",
+			text: isXS ? "Explore" : "Explore their contents and see what they share",
 		},
 		{
 			icon: <SwapHorizIcon className={classes.icon} />,
-			text: "Move your cards around without worries",
+			text: isXS ? "Swap" : "Move your cards around without worries",
 		},
 	];
 	return (
@@ -49,12 +64,13 @@ function LandingPage() {
 						minHeight="40vh"
 						justifyContent="space-around"
 						alignItems="flex-start"
+						mb={isXS ? 4 : 0}
 					>
 						<div>
 							<Typography variant="h2" paragraph>
 								Keep track of your cards though multiple decks
 							</Typography>
-							<Typography variant="h5" paragraph>
+							<Typography variant="h5" color="textSecondary" paragraph>
 								The easiest possible way
 							</Typography>
 						</div>
@@ -66,12 +82,21 @@ function LandingPage() {
 				</Grid>
 				<Grid item xs={12} sm={4}>
 					<Paper elevation={3}>
+						{isXS && (
+							<Typography
+								className={classes.xsSubtitle}
+								variant="h5"
+								align="center"
+							>
+								All in three steps
+							</Typography>
+						)}
 						<Box
 							display="flex"
-							flexDirection="column"
+							flexDirection={isXS ? "row" : "column"}
 							justifyContent="space-around"
 							alignItems="center"
-							padding={3}
+							padding={isXS ? 2 : 3}
 						>
 							{actionBoxes.map((action, i) => (
 								<Box

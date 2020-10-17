@@ -63,6 +63,7 @@ export interface IDeckBuilderInitialState {
 }
 export interface IMyDecksInitialState {
 	status: TStatus;
+	addCardStatus: TStatus;
 	decksStatus: TStatus;
 	singleCardEditStatus: TStatus;
 	beingEdited: string;

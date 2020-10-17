@@ -9,6 +9,10 @@ const useStyles = makeStyles((theme: Theme) =>
 		iconButton: {
 			padding: "1px",
 		},
+		iconButtonAlert: {
+			padding: "1px",
+			color: theme.palette.error.main,
+		},
 	})
 );
 export type TQuantityTogglerTarget = "quantity" | "availability";
@@ -16,6 +20,7 @@ interface IQuantityTogglerParams {
 	quantity: number;
 	cardname: string;
 	target: TQuantityTogglerTarget;
+	doNotDisable?: boolean;
 	handleChangeClick: (
 		cardname: string,
 		num: number,
@@ -26,6 +31,7 @@ function QuantityToggler({
 	quantity,
 	handleChangeClick,
 	cardname,
+	doNotDisable,
 	target,
 }: IQuantityTogglerParams) {
 	const classes = useStyles();
@@ -47,7 +53,12 @@ function QuantityToggler({
 			</IconButton>
 			{quantity}
 			<IconButton
-				className={classes.iconButton}
+				disabled={doNotDisable ? false : quantity < 1}
+				className={
+					doNotDisable && !quantity
+						? classes.iconButtonAlert
+						: classes.iconButton
+				}
 				onClick={handleChangeClick(cardname, -1, target)}
 			>
 				<RemoveIcon fontSize="small" />

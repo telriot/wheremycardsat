@@ -40,8 +40,6 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 );
 function DeckDetailTable({ deck }: { deck: IDeck }) {
-	console.log("refresh");
-
 	const classes = useStyles();
 	const theme = useTheme();
 	const isXS = useMediaQuery(theme.breakpoints.down("xs"));
