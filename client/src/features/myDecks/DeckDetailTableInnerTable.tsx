@@ -1,32 +1,13 @@
 import React from "react";
-import {
-	makeStyles,
-	createStyles,
-	Theme,
-	withStyles,
-} from "@material-ui/core/styles";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import DeckDetailTableInnerRow from "./DeckDetailTableInnerRow";
 import Table from "@material-ui/core/Table";
-import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { ICard, IDeck, ISharedCard } from "../../declarations";
 import StyledTableCell from "../../components/StyledTableCell";
 
-const useStyles = makeStyles((theme: Theme) =>
-	createStyles({
-		row: {},
-		rowShared: {
-			"& > *": {
-				borderBottom: "unset",
-			},
-			background: theme.palette.warning.light,
-		},
-		rowMissing: { background: "red" },
-		iconButton: { padding: "1px" },
-		smallCell: { maxWidth: "4rem" },
-	})
-);
+const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
 function DeckDetailTableInnerTable({
 	deck,

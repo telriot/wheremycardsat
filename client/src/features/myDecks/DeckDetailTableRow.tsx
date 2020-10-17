@@ -1,34 +1,34 @@
 import React from "react";
 import { ISharedCard, ICard, IDeck, IRouteParams } from "../../declarations";
+import { SharedDataObj } from "../../lib/classes";
 import { trimName } from "../../lib/helpers";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	isEditingSingleToggled,
 	selectBeingEdited,
 	selectMyDecks,
 	selectOnlyShared,
+	updateDeck,
 } from "./myDecksSlice";
 import {
 	createStyles,
 	makeStyles,
 	Theme,
 	useTheme,
-	withStyles,
 } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useParams } from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import TableRow from "@material-ui/core/TableRow";
+import ColorReactiveTableRow from "../../components/ColorReactiveTableRow";
+import DeckDetailTableInnerTable from "./DeckDetailTableInnerTable";
+import ManaFont from "../../components/ManaFont";
 import QuantityToggler, {
 	TQuantityTogglerTarget,
 } from "../../components/QuantityToggler";
-import { updateDeck } from "./myDecksSlice";
-import { SharedDataObj } from "../../lib/classes";
-import DeckDetailTableInnerTable from "./DeckDetailTableInnerTable";
-import ManaFont from "../../components/ManaFont";
 import StyledTableCell from "../../components/StyledTableCell";
-import ColorReactiveTableRow from "../../components/ColorReactiveTableRow";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		manaCostCell: {
@@ -43,7 +43,6 @@ const useStyles = makeStyles((theme: Theme) =>
 				padding: `${theme.spacing(0, 3)} !important`,
 			},
 		},
-		iconButton: { padding: "1px" },
 	})
 );
 

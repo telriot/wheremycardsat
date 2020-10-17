@@ -266,6 +266,7 @@ export const {
 	clearedPasswordResetError,
 } = authSlice.actions;
 export const selectAuthStatus = (state: IStore) => state.auth.status;
+export const selectIsAuth = (state: IStore) => state.auth.isAuth;
 export const selectAuthDialogActiveTab = (state: IStore) =>
 	state.auth.authDialogActiveTab;
 export const selectAuthDialogIsOpen = (state: IStore) =>

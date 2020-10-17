@@ -1,7 +1,7 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { fetchAuthState } from "./features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAuthState, selectIsAuth } from "./features/auth/authSlice";
 import {
 	createMuiTheme,
 	makeStyles,
@@ -14,9 +14,11 @@ import grey from "@material-ui/core/colors/grey";
 import Navbar from "./layout/Navbar";
 import ResetCredentials from "./features/auth/ResetCredentials";
 import PasswordUpdateForm from "./features/auth/PasswordUpdateForm";
+import DeckBuilderScreen from "./features/deckBuilder/DeckBuilderScreen";
+import DeckDetail from "./features/myDecks/DeckDetail";
 import LandingPage from "./features/landing/LandingPage";
 import MyDecksScreen from "./features/myDecks/MyDecksScreen";
-import DeckDetail from "./features/myDecks/DeckDetail";
+
 declare module "@material-ui/core/styles/createMuiTheme" {
 	interface Theme {
 		status: {
@@ -49,7 +51,7 @@ theme = responsiveFontSizes(theme);
 function App() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-
+	const isAuth = useSelector(selectIsAuth);
 	React.useEffect(() => {
 		dispatch(fetchAuthState());
 	});
@@ -59,7 +61,13 @@ function App() {
 				<Route exact path="/*" component={Navbar} />
 				<div className={classes.container}>
 					<Switch>
-						<Route exact path="/" component={LandingPage} />
+						<Route
+							exact
+							path="/"
+							component={isAuth ? MyDecksScreen : LandingPage}
+						/>
+						<Route exact path="/deckbuilder" component={DeckBuilderScreen} />
+
 						<Route exact path="/my-decks" component={MyDecksScreen} />
 						<Route exact path="/my-decks/:id" component={DeckDetail} />
 						<Route

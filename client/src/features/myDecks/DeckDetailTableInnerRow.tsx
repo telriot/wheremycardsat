@@ -3,15 +3,9 @@ import { IDeck, ISharedCard } from "../../declarations";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { isEditingSingleToggled, moveCardsBetweenDecks } from "./myDecksSlice";
-import {
-	makeStyles,
-	createStyles,
-	Theme,
-	withStyles,
-} from "@material-ui/core/styles";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import StyledTableCell from "../../components/StyledTableCell";
 
