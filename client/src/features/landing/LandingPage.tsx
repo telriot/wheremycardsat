@@ -8,7 +8,6 @@ import {
 	useTheme,
 } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
@@ -18,6 +17,7 @@ import Typography from "@material-ui/core/Typography";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import ViewListIcon from "@material-ui/icons/ViewList";
 import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		container: { maxWidth: "60rem" },

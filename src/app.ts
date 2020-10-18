@@ -69,14 +69,16 @@ app.use("/api", indexRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/decks", decksRouter);
 app.use("/api/users", usersRouter);
-
+console.log("Current directory:", path.resolve(__dirname, ".."));
 // Prepare Production Settings
 
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static("client/build"));
 
 	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+		res.sendFile(
+			path.resolve(__dirname, "..", "client", "build", "index.html")
+		);
 	});
 }
 
