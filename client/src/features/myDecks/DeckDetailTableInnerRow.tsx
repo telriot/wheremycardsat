@@ -95,7 +95,6 @@ function DeckDetailTableInnerRow({
 			cardname,
 			availability: sharedCard.availability - num,
 		};
-		console.log(cardname);
 		dispatch(isEditingSingleToggled(cardname));
 		dispatch(moveCardsBetweenDecks([originUpdate, destinationUpdate]));
 		handleClose();

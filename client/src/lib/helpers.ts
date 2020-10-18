@@ -49,14 +49,13 @@ export const normalizeCard = (card: any) => {
 				  },
 		type_line: card.type_line,
 	};
-	console.log(cardObj.mana_cost);
 	return cardObj;
 };
 
 export const calculateManaWeight = (manacost: string[]) => {
 	if (!manacost || !manacost.length) return 0;
 	let weight = 0;
-	let numbersRegex = new RegExp(/\d/);
+	let numbersRegex = new RegExp("^\\d+$");
 	for (let symbol of manacost) {
 		if (numbersRegex.test(symbol)) {
 			weight += ~~symbol;
@@ -77,9 +76,75 @@ export const calculateManaWeight = (manacost: string[]) => {
 				case "g":
 					weight += 1.014;
 					break;
-				case "x":
+				case "c":
 					weight += 1.015;
+				case "x":
+					weight += 1.016;
 					break;
+				case "s":
+					weight += 1.0165;
+					break;
+				case "wp":
+					weight += 1.0171;
+					break;
+				case "up":
+					weight += 1.0172;
+					break;
+				case "bp":
+					weight += 1.0173;
+					break;
+				case "rp":
+					weight += 1.0174;
+					break;
+				case "gp":
+					weight += 1.0175;
+					break;
+				case "wu":
+					weight += 1.0171;
+					break;
+				case "wb":
+					weight += 1.0172;
+					break;
+				case "br":
+					weight += 1.0173;
+					break;
+				case "bg":
+					weight += 1.0174;
+					break;
+				case "ub":
+					weight += 1.0175;
+					break;
+				case "ur":
+					weight += 1.0171;
+					break;
+				case "rg":
+					weight += 1.0172;
+					break;
+				case "rw":
+					weight += 1.0173;
+					break;
+				case "gw":
+					weight += 1.0174;
+					break;
+				case "gu":
+					weight += 1.0175;
+					break;
+				case "2w":
+					weight += 2.0342;
+					break;
+				case "2u":
+					weight += 2.0344;
+					break;
+				case "2b":
+					weight += 2.0346;
+					break;
+				case "2r":
+					weight += 2.0348;
+					break;
+				case "2g":
+					weight += 2.035;
+					break;
+
 				default:
 					weight += 0;
 			}
